@@ -12,8 +12,8 @@ This README is a **human walkthrough**: how to build an example loop using the `
 
 - `kb/loop-engineering.md` — the concept, distilled.
 - `.claude/skills/design-loop/` — a skill that *interviews you* and emits a runnable loop.
-- `examples/calc.py` + `examples/test_calc.py` — a tiny demo target. The test file is the **spec**
-  (never edited); a loop fixes `calc.py` until the tests pass.
+- `examples/simple-calculator/` — a ready-made, self-contained example loop (`fix-calc`) with its
+  own `.claude/skills/`, demo `calc.py`, spec `test_calc.py`, and `memory/`. See its `README.md`.
 
 ## Prerequisites
 
@@ -47,7 +47,7 @@ The skill asks ~10 questions. For our example, answer like this:
 | 2 | **Discovery** — how does it find the next thing to do? | Run the tests; the first `FAILED` line is the next item |
 | 3 | **Maker action** — one action that makes progress | Edit `calc.py` so that one failing test passes |
 | 4 | **Verification** — who checks, and how to stop cheating | A separate checker sub-agent re-runs tests AND confirms `test_calc.py` was not edited |
-| 5 | **Knowledge** — facts to hand it every run | Test cmd is `uv run --with pytest pytest -q`; source in `examples/calc.py`; spec in `examples/test_calc.py` (never touch) |
+| 5 | **Knowledge** — facts to hand it every run | Test cmd is `uv run --with pytest pytest -q`; source in `calc.py`; spec in `test_calc.py` (never touch) |
 | 6 | **Memory** — what to write down each run | Log of what was fixed, what failed, current pass/fail count |
 | 7 | **Connectors** (optional) | Skip — local files only |
 | 8 | **Parallelism** (optional) | Skip — one fix at a time |
@@ -75,21 +75,26 @@ memory/STATE.md        # persistent memory, seeded STATUS: UNKNOWN / LAST_RUN: n
 
 ### Step 4 — Launch the loop
 
-The skill prints the trigger command. Run it:
+The skill prints the trigger command. Run it. The trigger stays **thin** — it only points at the
+loop's `SKILL.md`. The stop condition and every step already live in that file, so you don't
+re-state them here:
 
 ```
-/goal "uv run --with pytest pytest -q exits 0"
+/goal "run the loop defined in fix-tests/SKILL.md"
 ```
 
-`/goal` is the engine: Claude keeps working across turns — read memory, find a failing test, fix
-`calc.py` (maker), verify with a separate checker, log to `memory/STATE.md` — and **stops itself**
-when the condition holds.
+`/goal` is the engine: Claude reads the named `SKILL.md` and follows it across turns — read memory,
+find a failing test, fix `calc.py` (maker), verify with a separate checker, log to
+`memory/STATE.md` — and **stops itself** when the loop's own stop condition holds.
+
+Why not just `/goal "pytest exits 0"`? That names no skill, so nothing loads your procedure and the
+agent reinvents it. Point at the `SKILL.md` and it runs the loop you designed.
 
 Fallback triggers if `/goal` isn't available, or you want a cadence:
 
 ```
-/loop run the fix-tests skill until pytest passes
-/schedule daily: run the fix-tests skill
+/loop run the loop in fix-tests/SKILL.md
+/schedule daily: run the loop in fix-tests/SKILL.md
 ```
 
 ### Step 5 — Watch it work
@@ -101,8 +106,11 @@ the loop halts. Anything it couldn't solve is parked in the handoff section for 
 
 ## Try it yourself
 
-Break a function in `examples/calc.py` (e.g. make `add` return `a - b`), then run Step 1. The loop should
-discover the failing test, fix `calc.py`, verify, and stop green — without you prompting each step.
+Two ways:
+
+- **Run the ready-made example:** open Claude Code in `examples/simple-calculator/`, break a
+  function in its `calc.py`, then `/goal "run the fix-calc loop"`. See that folder's `README.md`.
+- **Build your own from scratch:** start at Step 1 above and let `design-loop` interview you.
 
 ## The four rules every loop must keep
 

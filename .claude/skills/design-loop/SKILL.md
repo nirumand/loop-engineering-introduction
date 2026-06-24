@@ -173,17 +173,23 @@ If connectors (7) or parallelism (8) apply, add the matching step to the worker 
 
 ## Phase 3 — Hand off the trigger
 
-Print the exact launch command and tell the user to run it. `/goal` is the loop driver — it keeps
-working across turns until the condition holds:
+Print the exact launch command and tell the user to run it. The trigger must stay **thin** — it
+only *points at the loop*. The stop condition and every step already live in
+`<loop-path>/SKILL.md` (step 2 self-halts when the condition holds), so the user must **not**
+re-state them at launch. The worker lives in the loop folder, not under `.claude/skills/`, so it
+won't auto-load by name — the trigger names its **path** so the agent reads and follows it:
 
 ```
-/goal "<answer 1, the machine-checkable condition>"
+/goal "run the loop defined in <loop-path>/SKILL.md"
 ```
+
+Do NOT emit the bare condition (`/goal "<answer 1>"`) — that points at no skill, so nothing loads
+the procedure and the agent reinvents it. The condition belongs in the skill, not the trigger.
 
 Also give the fallbacks, in case `/goal` is unavailable or a cadence is wanted:
 
-- `/loop run the <loop-name> skill until <answer 1>` — self-paced/interval re-runs.
-- `/schedule daily: run the <loop-name> skill; <connector action> on success` — cron cadence.
+- `/loop run the loop in <loop-path>/SKILL.md` — self-paced/interval re-runs.
+- `/schedule daily: run the loop in <loop-path>/SKILL.md; <connector action> on success` — cron.
 
 Then summarize the loop back in one diagram: trigger → read memory → discover → maker → checker →
 log → repeat until stop condition → human handoff for the rest.
