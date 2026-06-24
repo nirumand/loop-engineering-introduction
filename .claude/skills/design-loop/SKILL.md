@@ -99,7 +99,18 @@ relevant.
    *Ask:* "Are there many independent items to handle at once, or strictly one at a time?" If many,
    note worktree isolation (`isolation: worktree`).
 
-9. **Human handoff.**
+9. **Warming-up (optional, recommended if the loop can delete/send/post).**
+   *In plain terms:* A loop runs on its own, so a mistake repeats every lap. To stay safe, its
+   first runs can be "look but don't touch" — it reads things and writes you a report, but changes
+   nothing. Once you've seen a few reports and trust its judgment, you let it start making changes.
+   Like a new hire who shadows for a week before getting the keys. (If the loop only edits local
+   files you can undo with git, you can skip this and let it act from run one.)
+   *Ask:* "For the first few runs, should the loop only look and report before it's allowed to
+   change anything?" If yes, the worker starts in **summarize-only** mode (read + report, no
+   writes), then you widen it to **constrained writes** (act, but with hard "do not X" rules), then
+   full autonomy. Always pair with a turn cap so a misbehaving loop halts itself.
+
+10. **Human handoff.**
    *In plain terms:* When the loop gets stuck on something it can't solve, where does it leave that
    item for a person? Every loop needs an exit ramp so problems get flagged, not silently dropped.
    Example: write it to a "needs-human" list, or open a labeled issue.
@@ -111,7 +122,7 @@ From the answers, create these files in the user's project (pick a short kebab-c
 `<loop-name>` from the goal):
 
 **`<loop-name>/SKILL.md`** — the worker skill, one iteration's procedure. Frontmatter `name` +
-`description`; body encodes answers 2–6 and 9 in this shape:
+`description`; body encodes answers 2–6, 9 and 10 in this shape:
 
 ```markdown
 ---
@@ -124,18 +135,24 @@ description: <one iteration of the loop — discover, fix, verify, log>. Use whe
 ## Knowledge
 <answer 5: commands, conventions, file locations>
 
+## Mode
+<if answer 9 = warming-up: this loop starts in SUMMARIZE-ONLY — read and report to `memory/STATE.md`,
+make NO changes. A human widens it to CONSTRAINED WRITES, then full autonomy. Omit this section if
+the loop acts from run one.>
+
 ## Procedure (one iteration)
 1. **Read state**: open `memory/STATE.md` — see what past runs already tried; skip those.
 2. **Discover**: <answer 2>. If the stop condition already holds, write it to state and STOP.
-3. **Make (maker sub-agent)**: dispatch a sub-agent to <answer 3>. <invariant: never edit the spec/check itself>.
+3. **Make (maker sub-agent)**: dispatch a sub-agent to <answer 3>. <invariant: never edit the spec/check itself>. <if summarize-only: skip the change — just record what it WOULD do.>
 4. **Check (checker sub-agent)**: dispatch a SEPARATE sub-agent to <answer 4> — independent verify + anti-cheat.
 5. **Log**: append a dated entry to `memory/STATE.md` (unit, what changed, new counts). Update STATUS.
-6. **Handoff**: if stuck/conflicting, record it in <answer 9> for a human and move on.
+6. **Handoff**: if stuck/conflicting, record it in <answer 10> for a human and move on.
 
 ## Rules
 - One unit per iteration. Minimal changes.
 - Maker ≠ checker (different sub-agent catches blind spots).
 - The stop condition (`<answer 1>`) is the only definition of done.
+- Respect the current Mode — summarize-only never writes outside `memory/`.
 ```
 
 **`memory/STATE.md`** — seed it:
@@ -176,4 +193,6 @@ log → repeat until stop condition → human handoff for the rest.
 - **Always** a machine-checkable stop condition. No condition → don't emit; go back to Q1.
 - **Always** maker ≠ checker.
 - **Always** a memory file and a human handoff path.
+- If the loop can delete/send/post, **warm it up** (summarize-only → constrained writes → full) and
+  cap iterations. Skip only when every action is locally reversible (version-controlled file edits).
 - Keep the user the engineer: the loop should accelerate work they understand, not hide it.

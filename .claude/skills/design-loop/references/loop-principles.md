@@ -40,6 +40,18 @@ lands in a triage inbox for a human.
 The loop accelerates work you understand deeply, but can mask comprehension gaps if you abdicate
 oversight.
 
+## Warming-up (read-only safety ramp)
+
+A loop runs unattended, so a wrong judgment repeats every cycle. Before letting a loop act on its
+own, ramp its permissions in phases — verify its *thinking* before its *actions* can do harm:
+
+1. **Summarize-only** — reads and reports, changes nothing. You confirm its judgment is sound.
+2. **Constrained writes** — acts, but behind hard rules ("do not delete / reply / archive").
+3. **Full autonomy** — widen only after several runs go right.
+
+A bad report is cheap to undo; 50 deleted emails are not. Pair with iteration **turn caps**. Skip
+the ramp only when every action is locally reversible (e.g. file edits under version control).
+
 ## Anti-patterns (the interview exists to prevent these)
 
 - **No stop condition** → runaway loop, burns tokens, never halts. Demand a machine-checkable goal.

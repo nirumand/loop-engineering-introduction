@@ -53,6 +53,21 @@ oversight.
 `/goal "<condition>"` is the iteration engine — keeps working across turns until the condition
 holds. `/loop` (interval/self-paced) and `/schedule` (cron) are alternative triggers.
 
+## Warming-up (read-only safety ramp)
+
+Before a loop is allowed to act unattended, ramp its permissions in phases — never let a fresh
+loop write on its first run. A wrong judgment in an autonomous loop repeats every cycle, so verify
+the agent's *thinking* before its *actions* can do damage. The loop equivalent of a dry run.
+
+1. **Summarize-only** — the agent may only read and report ("12 new emails, 3 look urgent, here's
+   why"). It changes nothing. You read the report and confirm its judgment is sound.
+2. **Constrained writes** — once its judgment is trusted, allow limited actions behind hard rules
+   ("label priority items, but do not reply, do not delete, do not archive").
+3. **Full autonomy** — after watching several runs go right, widen permissions.
+
+A bad report is cheap to undo; 50 deleted emails are not. Pair warming-up with iteration **turn
+caps** so a misbehaving loop halts on its own.
+
 ## Anti-patterns
 
 - **No stop condition** → runaway loop, never halts. Require a machine-checkable goal.

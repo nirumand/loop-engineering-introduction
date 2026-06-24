@@ -12,8 +12,8 @@ This README is a **human walkthrough**: how to build an example loop using the `
 
 - `kb/loop-engineering.md` — the concept, distilled.
 - `.claude/skills/design-loop/` — a skill that *interviews you* and emits a runnable loop.
-- `calc.py` + `test_calc.py` — a tiny demo target. The test file is the **spec** (never edited);
-  a loop fixes `calc.py` until the tests pass.
+- `examples/calc.py` + `examples/test_calc.py` — a tiny demo target. The test file is the **spec**
+  (never edited); a loop fixes `calc.py` until the tests pass.
 
 ## Prerequisites
 
@@ -39,7 +39,7 @@ Claude loads `design-loop` and gives a short plain-language primer, then starts 
 
 ### Step 2 — Answer the interview
 
-The skill asks ~9 questions. For our example, answer like this:
+The skill asks ~10 questions. For our example, answer like this:
 
 | # | Question (plain terms) | Your answer for this example |
 |---|------------------------|------------------------------|
@@ -47,14 +47,20 @@ The skill asks ~9 questions. For our example, answer like this:
 | 2 | **Discovery** — how does it find the next thing to do? | Run the tests; the first `FAILED` line is the next item |
 | 3 | **Maker action** — one action that makes progress | Edit `calc.py` so that one failing test passes |
 | 4 | **Verification** — who checks, and how to stop cheating | A separate checker sub-agent re-runs tests AND confirms `test_calc.py` was not edited |
-| 5 | **Knowledge** — facts to hand it every run | Test cmd is `uv run --with pytest pytest -q`; source in `calc.py`; spec in `test_calc.py` (never touch) |
+| 5 | **Knowledge** — facts to hand it every run | Test cmd is `uv run --with pytest pytest -q`; source in `examples/calc.py`; spec in `examples/test_calc.py` (never touch) |
 | 6 | **Memory** — what to write down each run | Log of what was fixed, what failed, current pass/fail count |
 | 7 | **Connectors** (optional) | Skip — local files only |
 | 8 | **Parallelism** (optional) | Skip — one fix at a time |
-| 9 | **Human handoff** — where stuck items go | Append to a `needs-human` section in the state file |
+| 9 | **Warming-up** (optional) — only watch & report first? | Skip — edits to `calc.py` are local and reversible via git |
+| 10 | **Human handoff** — where stuck items go | Append to a `needs-human` section in the state file |
 
 Question 1 is the important one: it must be something a **computer can check** (an exit code, a
 file's contents, a count). "Make the code better" is rejected — the loop could never decide it's done.
+
+Question 9 (**warming-up**) we skip here because a wrong edit to `calc.py` is harmless and undoable
+with git. For a loop that can delete files, send email, or post to Slack, answer "yes": it then
+starts in **summarize-only** (reads and reports, changes nothing), and you widen it to writes once
+you trust its judgment — like a new hire who shadows before getting the keys.
 
 ### Step 3 — Let the skill emit the scaffold
 
@@ -95,7 +101,7 @@ the loop halts. Anything it couldn't solve is parked in the handoff section for 
 
 ## Try it yourself
 
-Break a function in `calc.py` (e.g. make `add` return `a - b`), then run Step 1. The loop should
+Break a function in `examples/calc.py` (e.g. make `add` return `a - b`), then run Step 1. The loop should
 discover the failing test, fix `calc.py`, verify, and stop green — without you prompting each step.
 
 ## The four rules every loop must keep

@@ -12,7 +12,7 @@ a reusable skill that designs loops, and a tiny `calc` demo used to exercise a l
 ## Commands
 
 - Run tests: `uv run --with pytest pytest -q` (use `uv`, never bare `python`/`pytest` — bare invocation fails here).
-- Single test: `uv run --with pytest pytest -q test_calc.py::test_add`.
+- Single test: `uv run --with pytest pytest -q examples/test_calc.py::test_add`.
 
 ## Layout and architecture
 
@@ -24,8 +24,8 @@ a reusable skill that designs loops, and a tiny `calc` demo used to exercise a l
   questions, one at a time, stop-condition first → Phase 2 emits a `<loop-name>/SKILL.md` worker +
   `memory/STATE.md` seed → Phase 3 hands off a `/goal "<condition>"` trigger). Its
   `references/loop-principles.md` mirrors the kb and is cited when explaining recommendations.
-- `calc.py` + `test_calc.py` — minimal demo target. `test_calc.py` is the **spec** and must never
-  be edited by a maker; loops fix `calc.py` to make it pass.
+- `examples/calc.py` + `examples/test_calc.py` — minimal demo target. `test_calc.py` is the
+  **spec** and must never be edited by a maker; loops fix `calc.py` to make it pass.
 
 ## Loop design invariants (enforced by the design-loop skill — keep them when editing it)
 
