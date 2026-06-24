@@ -1,6 +1,6 @@
 ---
 name: fix-calc
-description: One iteration of the fix-calc loop — discover failing test, fix calc.py, verify, log. Use when running the fix-calc loop.
+description: Run one iteration of the fix-calc loop — discover the first failing test, fix calc.py, verify with a separate checker, log to memory. Use whenever the user wants calc.py fixed or the tests made green, e.g. "fix calc", "fix-calc", "run fix-calc", "make the calculator tests pass", "run the fix-calc loop", "/goal fix-calc", or any request to get `uv run --with pytest pytest -q` to exit 0 in this folder.
 ---
 
 # fix-calc loop

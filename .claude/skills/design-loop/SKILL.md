@@ -124,10 +124,17 @@ From the answers, create these files in the user's project (pick a short kebab-c
 **`<loop-name>/SKILL.md`** — the worker skill, one iteration's procedure. Frontmatter `name` +
 `description`; body encodes answers 2–6, 9 and 10 in this shape:
 
+The **description is the only thing the skill matcher reads** to decide whether to load the loop. A
+thin one-phrase description ("Use when running the X loop") misses every request that doesn't use
+that exact word — the agent then improvises instead of running the procedure. Pack the description
+with: what one iteration does, **several concrete trigger phrasings** the user might actually type
+(synonyms, the `/goal <name>` form, the bare verb), and the stop condition itself. Err toward too
+many trigger phrases.
+
 ```markdown
 ---
 name: <loop-name>
-description: <one iteration of the loop — discover, fix, verify, log>. Use when running the <loop-name> loop.
+description: Run one iteration of the <loop-name> loop — <discover, make, verify, log>. Use whenever the user wants <the goal in plain words>, e.g. "<phrase 1>", "<loop-name>", "run <loop-name>", "<plain-verb the task>", "run the <loop-name> loop", "/goal <loop-name>", or any request to make <answer 1: the stop condition> hold.
 ---
 
 # <loop-name> loop
@@ -199,6 +206,8 @@ log → repeat until stop condition → human handoff for the rest.
 - **Always** a machine-checkable stop condition. No condition → don't emit; go back to Q1.
 - **Always** maker ≠ checker.
 - **Always** a memory file and a human handoff path.
+- **Always** give the worker skill a trigger-rich `description` (multiple phrasings + the stop
+  condition). A one-phrase description is how a loop silently fails to load.
 - If the loop can delete/send/post, **warm it up** (summarize-only → constrained writes → full) and
   cap iterations. Skip only when every action is locally reversible (version-controlled file edits).
 - Keep the user the engineer: the loop should accelerate work they understand, not hide it.
